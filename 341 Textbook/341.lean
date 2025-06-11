@@ -1326,6 +1326,19 @@ theorem intermediate_value {f : ℝ → ℝ} {a b y: ℝ} (h : sq_continuous_on 
   intro x xS
   exact xS.1.2
 
+  have cab : c ∈ Icc a b := by
+    unfold Icc; constructor
+    apply supc.1; constructor
+    exact ⟨le_refl a, le_of_lt alb⟩
+    exact le_of_lt four
+    apply supc.2 b
+    intro x xS
+    exact xS.1.2
+
+
+  have gedger : f c ≤ y := by
+
+
   have ledger : f c ≥ y := by
     let g : (ℕ → ℝ) := fun n ↦ min (c + (1 / (n + 1))) b
 
@@ -1341,13 +1354,18 @@ theorem intermediate_value {f : ℝ → ℝ} {a b y: ℝ} (h : sq_continuous_on 
         exact le_of_lt alb
         apply min_le_right
 
-      have gC : g n ≥ c := by
-        unfold g; apply le_min
-        nth_rw 1 [← add_zero c]; apply add_le_add_left; norm_cast; apply div_nonneg
-        linarith; linarith
-        apply supc.2 b
-        intro x xS
-        exact xS.1.2
+      have gC : g n > c := by
+        unfold g; apply lt_min
+        nth_rw 1 [← add_zero c]; apply add_lt_add_left; norm_cast; apply div_pos
+        linarith; refine Nat.cast_pos'.mpr ?_; linarith
+        have : c ≤ b := cab.2
+        apply lt_of_le_of_ne this
+
+
+
+
+
+
 
 
       have gS : g n ∉ S := by
